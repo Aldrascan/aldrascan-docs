@@ -1,0 +1,35 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--no-cache'
+      - '-t'
+      - '$_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$_SERVICE_NAME:$COMMIT_SHA'
+      - '.'
+      - '-f'
+      - 'Dockerfile'
+    id: 'Build'
+
+  # Push the container image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '$_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$_SERVICE_NAME:$COMMIT_SHA'
+    id: 'Push'
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    args:
+      - 'run'
+      - 'services'
+      - 'update'
+      - '$_SERVICE_NAME'
+      - '--platform=managed'
+      - '--image=$_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$_SERVICE_NAME:$COMMIT_SHA'
+      - '--region=$_DEPLOY_REGION'
+      - '--quiet'
+    id: 'Deploy'
+
+images:
+  - '$_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$_SERVICE_NAME:$COMMIT_SHA'
