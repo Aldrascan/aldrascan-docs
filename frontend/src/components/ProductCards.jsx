@@ -1,6 +1,11 @@
 import React from 'react';
 import { products } from '../data/mock';
 
+const productImages = {
+  "Medit i900": "https://customer-assets.emergentagent.com/job_scanner-compare/artifacts/r48181kc_900c.jpg",
+  "Shining Elite": "https://customer-assets.emergentagent.com/job_scanner-compare/artifacts/jbgl64l7_Aoralscan_Elite-1.png"
+};
+
 const ProductCard = ({ product }) => {
   return (
     <div
@@ -9,6 +14,13 @@ const ProductCard = ({ product }) => {
                  transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
       style={{ borderTop: `5px solid ${product.accentColor}` }}
     >
+      <div className="flex justify-center mb-6">
+        <img 
+          src={productImages[product.name]} 
+          alt={product.name}
+          className="h-48 object-contain"
+        />
+      </div>
       <h3 className="text-2xl font-bold text-[#1F2937] mb-3">
         {product.name}
       </h3>
