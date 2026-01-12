@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { pitchAudienceOptions, generateMockSalesPitch } from '../data/mock';
+import axios from 'axios';
+import { pitchAudienceOptions } from '../data/mock';
 import 'remixicon/fonts/remixicon.css';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const TypingIndicator = ({ color = "#007AFF" }) => (
   <div className="flex justify-center gap-1.5 py-5">
@@ -15,22 +18,32 @@ const SalesPitchGenerator = () => {
   const [objection, setObjection] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleGenerate = async () => {
-    if (!objection) {
-      alert('Por favor indica la objeción a vencer');
-      return;
-    }
     setIsLoading(true);
     setResult(null);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    const response = generateMockSalesPitch(audience, objection);
-    setResult(response);
-    setIsLoading(false);
+    setError(null);
+    
+    try {
+      const response = await axios.post(`${API_URL}/api/ai/sales-pitch`, {
+        audience: audience,
+        objection: objection || 'precio/inversión inicial'
+      });
+      setResult(response.data.response);
+    } catch (err) {
+      console.error('Sales pitch generation error:', err);
+      setError('Error al generar el argumentario. Por favor, inténtalo de nuevo.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <section className="bg-[#EEF3FA] border border-[#D1D1D6] rounded-3xl p-8 md:p-[60px] mb-[100px] relative overflow-hidden">
+    <section 
+      data-testid="sales-pitch-section"
+      className="bg-[#EEF3FA] border border-[#D1D1D6] rounded-3xl p-8 md:p-[60px] mb-[100px] relative overflow-hidden"
+    >
       <div className="text-center mb-10 relative z-10">
         <span className="inline-block px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide mb-4 bg-white text-[#007AFF]">
           NEGOCIACIÓN
@@ -44,6 +57,7 @@ const SalesPitchGenerator = () => {
           <div className="mb-5">
             <label className="block text-[#0B0F18] font-medium mb-2">Audiencia Objetivo</label>
             <select 
+              data-testid="pitch-audience-select"
               value={audience}
               onChange={(e) => setAudience(e.target.value)}
               className="w-full p-4 border border-[#D1D1D6] rounded-lg bg-white text-[#0B0F18]
@@ -57,9 +71,10 @@ const SalesPitchGenerator = () => {
           </div>
 
           <div className="mb-5">
-            <label className="block text-[#0B0F18] font-medium mb-2">Principal Objeción a Vencer</label>
+            <label className="block text-[#0B0F18] font-medium mb-2">Principal Objeción a Vencer (opcional)</label>
             <input
               type="text"
+              data-testid="pitch-objection-input"
               value={objection}
               onChange={(e) => setObjection(e.target.value)}
               placeholder="Ej. El coste es muy alto"
@@ -70,6 +85,7 @@ const SalesPitchGenerator = () => {
           </div>
 
           <button
+            data-testid="generate-pitch-btn"
             onClick={handleGenerate}
             disabled={isLoading}
             className="w-full bg-[#007AFF] text-white py-4 rounded-lg font-bold text-sm
@@ -85,8 +101,12 @@ const SalesPitchGenerator = () => {
           <h4 className="text-[#0B0F18] font-bold text-sm uppercase tracking-wide mb-3">Argumentos Clave:</h4>
           {isLoading ? (
             <TypingIndicator />
+          ) : error ? (
+            <div className="text-red-500 py-4" data-testid="pitch-error">
+              {error}
+            </div>
           ) : result ? (
-            <div className="text-[#5B667A] whitespace-pre-line animate-fadeIn text-[15px] leading-relaxed">
+            <div className="text-[#5B667A] whitespace-pre-line animate-fadeIn text-[15px] leading-relaxed" data-testid="pitch-result">
               {result}
             </div>
           ) : (

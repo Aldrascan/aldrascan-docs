@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { generateMockROI } from '../data/mock';
+import axios from 'axios';
 import 'remixicon/fonts/remixicon.css';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const TypingIndicator = ({ color = "#007AFF" }) => (
   <div className="flex justify-center gap-1.5 py-5">
@@ -15,6 +17,7 @@ const ROICalculator = () => {
   const [cost, setCost] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleCalculate = async () => {
     if (!volume) {
@@ -23,14 +26,27 @@ const ROICalculator = () => {
     }
     setIsLoading(true);
     setResult(null);
-    await new Promise(resolve => setTimeout(resolve, 1200));
-    const response = generateMockROI(volume, cost);
-    setResult(response);
-    setIsLoading(false);
+    setError(null);
+    
+    try {
+      const response = await axios.post(`${API_URL}/api/ai/roi`, {
+        volume: volume,
+        cost: cost || '15'
+      });
+      setResult(response.data.response);
+    } catch (err) {
+      console.error('ROI calculation error:', err);
+      setError('Error al calcular el ROI. Por favor, inténtalo de nuevo.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <section className="bg-[#EEF3FA] border border-[#D1D1D6] rounded-3xl p-8 md:p-[60px] mb-[100px] relative overflow-hidden">
+    <section 
+      data-testid="roi-calculator-section"
+      className="bg-[#EEF3FA] border border-[#D1D1D6] rounded-3xl p-8 md:p-[60px] mb-[100px] relative overflow-hidden"
+    >
       <div className="text-center mb-10 relative z-10">
         <span className="inline-block px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide mb-4 bg-white text-[#007AFF]">
           RENTABILIDAD
@@ -45,6 +61,7 @@ const ROICalculator = () => {
             <label className="block text-[#0B0F18] font-medium mb-2">Impresiones Tradicionales al Mes</label>
             <input
               type="number"
+              data-testid="roi-volume-input"
               value={volume}
               onChange={(e) => setVolume(e.target.value)}
               placeholder="Ej. 30"
@@ -58,6 +75,7 @@ const ROICalculator = () => {
             <label className="block text-[#0B0F18] font-medium mb-2">Coste Promedio por Impresión (€)</label>
             <input
               type="number"
+              data-testid="roi-cost-input"
               value={cost}
               onChange={(e) => setCost(e.target.value)}
               placeholder="Ej. 15 (Material + Envío)"
@@ -68,6 +86,7 @@ const ROICalculator = () => {
           </div>
 
           <button
+            data-testid="calculate-roi-btn"
             onClick={handleCalculate}
             disabled={isLoading}
             className="w-full bg-[#007AFF] text-white py-4 rounded-lg font-bold text-sm
@@ -83,8 +102,12 @@ const ROICalculator = () => {
           <h4 className="text-[#0B0F18] font-bold text-sm uppercase tracking-wide mb-3">Tu Análisis de Rentabilidad:</h4>
           {isLoading ? (
             <TypingIndicator />
+          ) : error ? (
+            <div className="text-red-500 py-4" data-testid="roi-error">
+              {error}
+            </div>
           ) : result ? (
-            <div className="text-[#5B667A] whitespace-pre-line animate-fadeIn text-[15px] leading-relaxed">
+            <div className="text-[#5B667A] whitespace-pre-line animate-fadeIn text-[15px] leading-relaxed" data-testid="roi-result">
               {result}
             </div>
           ) : (
