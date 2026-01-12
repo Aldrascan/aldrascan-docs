@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { faqTopicOptions, generateMockFAQ } from '../data/mock';
+import axios from 'axios';
+import { faqTopicOptions } from '../data/mock';
 import 'remixicon/fonts/remixicon.css';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const TypingIndicator = ({ color = "#007AFF" }) => (
   <div className="flex justify-center gap-1.5 py-5">
@@ -14,18 +17,31 @@ const FAQGenerator = () => {
   const [topic, setTopic] = useState('Precisión');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleGenerate = async () => {
     setIsLoading(true);
     setResult(null);
-    await new Promise(resolve => setTimeout(resolve, 1200));
-    const response = generateMockFAQ(topic);
-    setResult(response);
-    setIsLoading(false);
+    setError(null);
+    
+    try {
+      const response = await axios.post(`${API_URL}/api/ai/faq`, {
+        topic: topic
+      });
+      setResult(response.data.response);
+    } catch (err) {
+      console.error('FAQ generation error:', err);
+      setError('Error al generar las FAQs. Por favor, inténtalo de nuevo.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <section className="bg-white border border-[#D1D1D6] rounded-3xl p-8 md:p-[60px] mb-[100px] relative overflow-hidden">
+    <section 
+      data-testid="faq-generator-section"
+      className="bg-white border border-[#D1D1D6] rounded-3xl p-8 md:p-[60px] mb-[100px] relative overflow-hidden"
+    >
       <div className="text-center mb-10 relative z-10">
         <span className="inline-block px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide mb-4 bg-[#EEF3FA] text-[#007AFF]">
           PREGUNTAS FRECUENTES
@@ -39,6 +55,7 @@ const FAQGenerator = () => {
           <div className="mb-5">
             <label className="block text-[#0B0F18] font-medium mb-2">Tema de las Preguntas</label>
             <select 
+              data-testid="faq-topic-select"
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               className="w-full p-4 border border-[#D1D1D6] rounded-lg bg-white text-[#0B0F18]
@@ -52,6 +69,7 @@ const FAQGenerator = () => {
           </div>
 
           <button
+            data-testid="generate-faq-btn"
             onClick={handleGenerate}
             disabled={isLoading}
             className="w-full bg-[#007AFF] text-white py-4 rounded-lg font-bold text-sm
@@ -67,10 +85,14 @@ const FAQGenerator = () => {
           <h4 className="text-[#0B0F18] font-bold text-sm uppercase tracking-wide mb-3">Preguntas Frecuentes Generadas:</h4>
           {isLoading ? (
             <TypingIndicator />
+          ) : error ? (
+            <div className="bg-white p-4 rounded-lg border border-[#D1D1D6]">
+              <div className="text-red-500" data-testid="faq-error">{error}</div>
+            </div>
           ) : (
             <div className="bg-white p-4 rounded-lg border border-[#D1D1D6] min-h-[150px]">
               {result ? (
-                <div className="text-[#5B667A] whitespace-pre-line animate-fadeIn text-[15px]">
+                <div className="text-[#5B667A] whitespace-pre-line animate-fadeIn text-[15px]" data-testid="faq-result">
                   {result}
                 </div>
               ) : (
