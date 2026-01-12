@@ -1,50 +1,73 @@
 import React from 'react';
 import { products } from '../data/mock';
-
-const productImages = {
-  "Medit i900": "https://customer-assets.emergentagent.com/job_scanner-compare/artifacts/r48181kc_900c.jpg",
-  "Shining Elite": "https://customer-assets.emergentagent.com/job_scanner-compare/artifacts/jbgl64l7_Aoralscan_Elite-1.png"
-};
+import 'remixicon/fonts/remixicon.css';
 
 const ProductCard = ({ product }) => {
+  const isMetit = product.name === "Medit i900";
+  
   return (
-    <div
-      className="bg-white rounded-3xl p-10 border border-gray-100
-                 shadow-[0_20px_40px_rgba(0,0,0,0.06)]
-                 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
-      style={{ borderTop: `5px solid ${product.accentColor}` }}
+    <article
+      className={`bg-white rounded-3xl overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.06)]
+                  transition-transform duration-300 hover:-translate-y-[5px] flex flex-col
+                  border ${isMetit ? 'border-[#A78BFA]' : 'border-[#63B3ED]'}`}
+      style={{ borderTopWidth: '6px' }}
     >
-      <div className="flex justify-center mb-6">
+      {/* Card Header */}
+      <div className="p-10 text-center border-b border-gray-100">
+        <span 
+          className="inline-block px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide mb-4"
+          style={{ backgroundColor: product.badgeColor.bg, color: product.badgeColor.text }}
+        >
+          {product.badge}
+        </span>
+        <h2 className={`text-[28px] font-bold mb-2 ${isMetit ? 'text-[#243C5B]' : 'text-[#63B3ED]'}`}>
+          {product.name}
+        </h2>
+        <p className="text-[#4B5563] text-sm m-0">{product.tagline}</p>
+      </div>
+
+      {/* Product Image */}
+      <div className="h-[300px] flex items-center justify-center p-10 bg-gradient-to-b from-[#f8fafc] to-[#e2e8f0]">
         <img 
-          src={productImages[product.name]} 
+          src={product.image} 
           alt={product.name}
-          className="h-48 object-contain"
+          className="max-h-full max-w-full object-contain"
         />
       </div>
-      <h3 className="text-2xl font-bold text-[#1F2937] mb-3">
-        {product.name}
-      </h3>
-      <p className="text-[#4B5563] mb-5">
-        {product.tagline}
-      </p>
-      <ul className="text-left pl-5 space-y-2">
-        {product.features.map((feature, index) => (
-          <li 
-            key={index} 
-            className="text-[#4B5563] list-disc"
+
+      {/* Card Body */}
+      <div className="p-10 flex-grow flex flex-col">
+        <p className="text-[#4B5563] text-base text-center mb-8">
+          {product.description}
+        </p>
+        <ul className="space-y-4 mb-auto">
+          {product.features.map((feature, index) => (
+            <li key={index} className="flex items-center text-[#4B5563]">
+              <i className={`${feature.icon} text-[#63B3ED] mr-3 text-xl`}></i>
+              <span>{feature.text}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-8 text-center">
+          <button 
+            className={`w-full py-3 px-8 rounded-full font-bold text-sm uppercase tracking-wide
+                       border-2 transition-all duration-300
+                       ${isMetit 
+                         ? 'border-[#A78BFA] text-[#A78BFA] hover:bg-[#A78BFA] hover:text-white' 
+                         : 'border-[#63B3ED] text-[#63B3ED] hover:bg-[#63B3ED] hover:text-white'}`}
           >
-            {feature}
-          </li>
-        ))}
-      </ul>
-    </div>
+            DETALLES
+          </button>
+        </div>
+      </div>
+    </article>
   );
 };
 
 const ProductCards = () => {
   return (
     <div className="w-full max-w-[1200px] mx-auto px-5" id="models">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 my-16">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-[120px] mt-16">
         {products.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
