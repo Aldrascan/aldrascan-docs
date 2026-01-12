@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { 
-  specialties, volumeOptions, priorityOptions, 
-  generateMockAIResponse, generateMockTechResponse 
-} from '../data/mock';
+import axios from 'axios';
+import { specialties, volumeOptions, priorityOptions } from '../data/mock';
 import 'remixicon/fonts/remixicon.css';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const TypingIndicator = ({ color = "#007AFF" }) => (
   <div className="flex justify-center gap-1.5 py-5">
@@ -19,29 +19,51 @@ const AIConsultant = () => {
   const [priority, setPriority] = useState('Rentabilidad y ROI rápido');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
 
   // Tech Chat State
   const [techQuestion, setTechQuestion] = useState('');
   const [techLoading, setTechLoading] = useState(false);
   const [techResult, setTechResult] = useState(null);
+  const [techError, setTechError] = useState(null);
 
   const handleConsult = async () => {
     setIsLoading(true);
     setResult(null);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    const response = generateMockAIResponse(clinicType, caseVolume, priority);
-    setResult(response);
-    setIsLoading(false);
+    setError(null);
+    
+    try {
+      const response = await axios.post(`${API_URL}/api/ai/consultant`, {
+        specialty: clinicType,
+        volume: caseVolume,
+        priority: priority
+      });
+      setResult(response.data.response);
+    } catch (err) {
+      console.error('AI Consultant error:', err);
+      setError('Error al generar la recomendación. Por favor, inténtalo de nuevo.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleTechQuestion = async () => {
     if (!techQuestion.trim()) return;
     setTechLoading(true);
     setTechResult(null);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    const response = generateMockTechResponse(techQuestion);
-    setTechResult(response);
-    setTechLoading(false);
+    setTechError(null);
+    
+    try {
+      const response = await axios.post(`${API_URL}/api/ai/tech-qa`, {
+        question: techQuestion
+      });
+      setTechResult(response.data.response);
+    } catch (err) {
+      console.error('Tech Q&A error:', err);
+      setTechError('Error al procesar tu pregunta. Por favor, inténtalo de nuevo.');
+    } finally {
+      setTechLoading(false);
+    }
   };
 
   return (
@@ -49,11 +71,12 @@ const AIConsultant = () => {
       {/* Main AI Section */}
       <section 
         id="ai-tool"
+        data-testid="ai-consultant-section"
         className="bg-white border border-[#D1D1D6] rounded-3xl p-8 md:p-[60px] my-[100px] shadow-[0_20px_40px_rgba(0,0,0,0.06)]"
       >
         <div className="text-center mb-10">
           <span className="inline-block px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide mb-4 bg-[#EEF3FA] text-[#007AFF]">
-            IA BETA
+            IA POWERED
           </span>
           <h3 className="text-[32px] font-bold text-[#0B0F18] mb-3">Asistente Inteligente</h3>
           <p className="text-[#5B667A]">¿Indeciso? Nuestra IA analiza tu perfil y te recomienda la mejor opción.</p>
@@ -65,6 +88,7 @@ const AIConsultant = () => {
             <div className="mb-5">
               <label className="block text-[#0B0F18] font-medium mb-2">Especialidad Principal</label>
               <select 
+                data-testid="specialty-select"
                 value={clinicType}
                 onChange={(e) => setClinicType(e.target.value)}
                 className="w-full p-4 border border-[#D1D1D6] rounded-lg bg-white text-[#0B0F18]
@@ -80,6 +104,7 @@ const AIConsultant = () => {
             <div className="mb-5">
               <label className="block text-[#0B0F18] font-medium mb-2">Volumen Mensual</label>
               <select 
+                data-testid="volume-select"
                 value={caseVolume}
                 onChange={(e) => setCaseVolume(e.target.value)}
                 className="w-full p-4 border border-[#D1D1D6] rounded-lg bg-white text-[#0B0F18]
@@ -95,6 +120,7 @@ const AIConsultant = () => {
             <div className="mb-5">
               <label className="block text-[#0B0F18] font-medium mb-2">Prioridad Principal</label>
               <select 
+                data-testid="priority-select"
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
                 className="w-full p-4 border border-[#D1D1D6] rounded-lg bg-white text-[#0B0F18]
@@ -108,6 +134,7 @@ const AIConsultant = () => {
             </div>
 
             <button
+              data-testid="generate-recommendation-btn"
               onClick={handleConsult}
               disabled={isLoading}
               className="w-full bg-[#007AFF] text-white
@@ -125,8 +152,12 @@ const AIConsultant = () => {
           <div className="min-h-[280px] bg-[#EEF3FA] rounded-2xl p-6">
             {isLoading ? (
               <TypingIndicator color="#007AFF" />
+            ) : error ? (
+              <div className="text-red-500 text-center py-4" data-testid="consultant-error">
+                {error}
+              </div>
             ) : result ? (
-              <div className="animate-fadeIn">
+              <div className="animate-fadeIn" data-testid="consultant-result">
                 <h4 className="text-[#0B0F18] font-bold mb-3">Análisis Personalizado:</h4>
                 <div className="text-[#5B667A] whitespace-pre-line leading-relaxed">
                   {result}
@@ -143,7 +174,10 @@ const AIConsultant = () => {
       </section>
 
       {/* Tech Chat Section */}
-      <section className="bg-[#EEF3FA] rounded-3xl p-8 md:p-[60px] mb-[100px] border-l-4 border-[#0B0F18]">
+      <section 
+        data-testid="tech-qa-section"
+        className="bg-[#EEF3FA] rounded-3xl p-8 md:p-[60px] mb-[100px] border-l-4 border-[#0B0F18]"
+      >
         <div className="text-center mb-6">
           <h3 className="text-[28px] font-bold text-[#0B0F18] mb-2">Dudas Técnicas Express</h3>
           <p className="text-[#5B667A]">Respuesta instantánea sobre especificaciones.</p>
@@ -154,6 +188,7 @@ const AIConsultant = () => {
             <label className="block text-[#0B0F18] font-medium mb-2">Tu pregunta:</label>
             <input
               type="text"
+              data-testid="tech-question-input"
               value={techQuestion}
               onChange={(e) => setTechQuestion(e.target.value)}
               placeholder="Ej: ¿Escanea metal sin polvo?"
@@ -163,6 +198,7 @@ const AIConsultant = () => {
               onKeyPress={(e) => e.key === 'Enter' && handleTechQuestion()}
             />
             <button
+              data-testid="tech-question-btn"
               onClick={handleTechQuestion}
               disabled={techLoading || !techQuestion.trim()}
               className="w-full py-3 px-8 rounded-full font-bold text-sm uppercase tracking-wide
@@ -177,8 +213,12 @@ const AIConsultant = () => {
           <div className="min-h-[120px]">
             {techLoading ? (
               <TypingIndicator color="#0B0F18" />
+            ) : techError ? (
+              <div className="text-red-500 text-center py-4" data-testid="tech-error">
+                {techError}
+              </div>
             ) : techResult ? (
-              <div className="bg-white p-5 rounded-xl text-[#0B0F18] animate-fadeIn border border-[#D1D1D6]">
+              <div className="bg-white p-5 rounded-xl text-[#0B0F18] animate-fadeIn border border-[#D1D1D6]" data-testid="tech-result">
                 {techResult}
               </div>
             ) : (

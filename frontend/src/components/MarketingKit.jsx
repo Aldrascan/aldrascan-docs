@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { marketingModelOptions, marketingFocusOptions, generateMockMarketingCopy } from '../data/mock';
+import axios from 'axios';
+import { marketingModelOptions, marketingFocusOptions } from '../data/mock';
 import 'remixicon/fonts/remixicon.css';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const TypingIndicator = () => (
   <div className="flex justify-center gap-1.5 py-5">
@@ -15,18 +18,32 @@ const MarketingKit = () => {
   const [focus, setFocus] = useState('Adiós a las pastas');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleGenerate = async () => {
     setIsLoading(true);
     setResult(null);
-    await new Promise(resolve => setTimeout(resolve, 1200));
-    const response = generateMockMarketingCopy(model, focus);
-    setResult(response);
-    setIsLoading(false);
+    setError(null);
+    
+    try {
+      const response = await axios.post(`${API_URL}/api/ai/marketing`, {
+        model: model,
+        focus: focus
+      });
+      setResult(response.data.response);
+    } catch (err) {
+      console.error('Marketing generation error:', err);
+      setError('Error al generar el contenido. Por favor, inténtalo de nuevo.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <section className="bg-[#0B0F18] text-white rounded-3xl p-8 md:p-[60px] mb-[100px] relative overflow-hidden">
+    <section 
+      data-testid="marketing-kit-section"
+      className="bg-[#0B0F18] text-white rounded-3xl p-8 md:p-[60px] mb-[100px] relative overflow-hidden"
+    >
       {/* Emoji Background */}
       <div className="absolute right-[-50px] bottom-[-50px] text-[200px] opacity-5 rotate-[-20deg] select-none">
         📢
@@ -43,6 +60,7 @@ const MarketingKit = () => {
           <div className="mb-5">
             <label className="block text-white font-medium mb-2">Modelo a anunciar:</label>
             <select 
+              data-testid="marketing-model-select"
               value={model}
               onChange={(e) => setModel(e.target.value)}
               className="w-full p-4 rounded-lg bg-white/10 text-white border border-white/30
@@ -57,6 +75,7 @@ const MarketingKit = () => {
           <div className="mb-5">
             <label className="block text-white font-medium mb-2">Enfoque del mensaje:</label>
             <select 
+              data-testid="marketing-focus-select"
               value={focus}
               onChange={(e) => setFocus(e.target.value)}
               className="w-full p-4 rounded-lg bg-white/10 text-white border border-white/30
@@ -69,6 +88,7 @@ const MarketingKit = () => {
           </div>
 
           <button
+            data-testid="generate-marketing-btn"
             onClick={handleGenerate}
             disabled={isLoading}
             className="bg-[#007AFF] text-white py-3 px-8 rounded-full font-bold text-sm uppercase tracking-wide
@@ -86,10 +106,14 @@ const MarketingKit = () => {
             <h4 className="text-sm uppercase tracking-wide opacity-80 mb-4">Borrador Generado:</h4>
             {isLoading ? (
               <TypingIndicator />
+            ) : error ? (
+              <div className="bg-red-500/20 text-white rounded-xl p-5" data-testid="marketing-error">
+                {error}
+              </div>
             ) : (
               <div className="bg-white text-[#0B0F18] rounded-xl p-5 min-h-[100px]">
                 {result ? (
-                  <div className="whitespace-pre-line animate-fadeIn">{result}</div>
+                  <div className="whitespace-pre-line animate-fadeIn" data-testid="marketing-result">{result}</div>
                 ) : (
                   <span className="text-[#5B667A] italic">Tu copy aparecerá aquí...</span>
                 )}

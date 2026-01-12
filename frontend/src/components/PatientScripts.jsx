@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { treatmentOptions, concernOptions, generateMockPatientScript } from '../data/mock';
+import axios from 'axios';
+import { treatmentOptions, concernOptions } from '../data/mock';
 import 'remixicon/fonts/remixicon.css';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const TypingIndicator = ({ color = "#007AFF" }) => (
   <div className="flex justify-center gap-1.5 py-5">
@@ -15,18 +18,32 @@ const PatientScripts = () => {
   const [concern, setConcern] = useState('Reflejo de náusea');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleGenerate = async () => {
     setIsLoading(true);
     setResult(null);
-    await new Promise(resolve => setTimeout(resolve, 1200));
-    const response = generateMockPatientScript(treatment, concern);
-    setResult(response);
-    setIsLoading(false);
+    setError(null);
+    
+    try {
+      const response = await axios.post(`${API_URL}/api/ai/patient-script`, {
+        treatment: treatment,
+        concern: concern
+      });
+      setResult(response.data.response);
+    } catch (err) {
+      console.error('Patient script generation error:', err);
+      setError('Error al generar el guion. Por favor, inténtalo de nuevo.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <section className="bg-[#EEF3FA] border border-[#D1D1D6] rounded-3xl p-8 md:p-[60px] mb-[100px] relative overflow-hidden">
+    <section 
+      data-testid="patient-scripts-section"
+      className="bg-[#EEF3FA] border border-[#D1D1D6] rounded-3xl p-8 md:p-[60px] mb-[100px] relative overflow-hidden"
+    >
       <div className="text-center mb-10 relative z-10">
         <span className="inline-block px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide mb-4 bg-white text-[#007AFF]">
           COMUNICACIÓN
@@ -41,6 +58,7 @@ const PatientScripts = () => {
           <div className="mb-5">
             <label className="block text-[#0B0F18] font-medium mb-2">Tratamiento Propuesto</label>
             <select 
+              data-testid="treatment-select"
               value={treatment}
               onChange={(e) => setTreatment(e.target.value)}
               className="w-full p-4 border border-[#D1D1D6] rounded-lg bg-white text-[#0B0F18]
@@ -56,6 +74,7 @@ const PatientScripts = () => {
           <div className="mb-5">
             <label className="block text-[#0B0F18] font-medium mb-2">Perfil/Preocupación del Paciente</label>
             <select 
+              data-testid="concern-select"
               value={concern}
               onChange={(e) => setConcern(e.target.value)}
               className="w-full p-4 border border-[#D1D1D6] rounded-lg bg-white text-[#0B0F18]
@@ -69,6 +88,7 @@ const PatientScripts = () => {
           </div>
 
           <button
+            data-testid="generate-script-btn"
             onClick={handleGenerate}
             disabled={isLoading}
             className="w-full bg-[#007AFF] text-white py-4 rounded-lg font-bold text-sm
@@ -85,8 +105,12 @@ const PatientScripts = () => {
           <h4 className="text-[#0B0F18] font-bold text-sm uppercase tracking-wide mb-3">Guion Sugerido:</h4>
           {isLoading ? (
             <TypingIndicator />
+          ) : error ? (
+            <div className="text-red-500 py-4" data-testid="script-error">
+              {error}
+            </div>
           ) : result ? (
-            <div className="text-[#5B667A] whitespace-pre-line animate-fadeIn leading-relaxed">
+            <div className="text-[#5B667A] whitespace-pre-line animate-fadeIn leading-relaxed" data-testid="script-result">
               {result}
             </div>
           ) : (
