@@ -27,11 +27,19 @@ const ProductCard = ({ product }) => {
       </div>
 
       {/* Product Image */}
-      <div className="h-[300px] flex items-center justify-center p-10 bg-gradient-to-b from-[#f8fafc] to-[#e2e8f0]">
+      <div 
+        className="h-[350px] flex items-center justify-center p-6"
+        style={{ 
+          background: isMetit 
+            ? 'linear-gradient(180deg, #f8f7ff 0%, #ede9fe 100%)' 
+            : 'linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%)'
+        }}
+      >
         <img 
           src={product.image} 
           alt={product.name}
-          className="max-h-full max-w-full object-contain"
+          className="max-h-[320px] w-auto object-contain drop-shadow-lg"
+          style={{ maxWidth: '100%' }}
         />
       </div>
 
