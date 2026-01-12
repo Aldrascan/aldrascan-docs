@@ -5,9 +5,11 @@ const Header = () => {
   return (
     <header className="bg-[#243C5B] h-20 flex items-center sticky top-0 z-50">
       <div className="w-full max-w-[1200px] mx-auto px-5 flex justify-between items-center">
-        <div className="text-white text-2xl font-bold">
-          {companyInfo.name}
-        </div>
+        <img 
+          src="https://customer-assets.emergentagent.com/job_scanner-compare/artifacts/6xzo2lig_AldraScan%20Blanco.png"
+          alt={companyInfo.name}
+          className="h-10 object-contain"
+        />
         <a
           href={`https://wa.me/${companyInfo.whatsappNumber}`}
           target="_blank"
