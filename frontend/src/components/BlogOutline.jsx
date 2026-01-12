@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { blogTopicOptions, generateMockBlogOutline } from '../data/mock';
+import axios from 'axios';
+import { blogTopicOptions } from '../data/mock';
 import 'remixicon/fonts/remixicon.css';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const TypingIndicator = ({ color = "#007AFF" }) => (
   <div className="flex justify-center gap-1.5 py-5">
@@ -14,18 +17,31 @@ const BlogOutline = () => {
   const [topic, setTopic] = useState('Beneficios de la Impresión Digital');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleGenerate = async () => {
     setIsLoading(true);
     setResult(null);
-    await new Promise(resolve => setTimeout(resolve, 1200));
-    const response = generateMockBlogOutline(topic);
-    setResult(response);
-    setIsLoading(false);
+    setError(null);
+    
+    try {
+      const response = await axios.post(`${API_URL}/api/ai/blog-outline`, {
+        topic: topic
+      });
+      setResult(response.data.response);
+    } catch (err) {
+      console.error('Blog outline generation error:', err);
+      setError('Error al generar el esquema. Por favor, inténtalo de nuevo.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <section className="bg-[#EEF3FA] border border-[#D1D1D6] rounded-3xl p-8 md:p-[60px] mb-[100px] relative overflow-hidden">
+    <section 
+      data-testid="blog-outline-section"
+      className="bg-[#EEF3FA] border border-[#D1D1D6] rounded-3xl p-8 md:p-[60px] mb-[100px] relative overflow-hidden"
+    >
       <div className="text-center mb-10 relative z-10">
         <span className="inline-block px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide mb-4 bg-white text-[#007AFF]">
           CONTENIDO
@@ -39,6 +55,7 @@ const BlogOutline = () => {
           <div className="mb-5">
             <label className="block text-[#0B0F18] font-medium mb-2">Tema del Artículo</label>
             <select 
+              data-testid="blog-topic-select"
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               className="w-full p-4 border border-[#D1D1D6] rounded-lg bg-white text-[#0B0F18]
@@ -52,6 +69,7 @@ const BlogOutline = () => {
           </div>
 
           <button
+            data-testid="generate-blog-btn"
             onClick={handleGenerate}
             disabled={isLoading}
             className="w-full bg-[#007AFF] text-white py-4 rounded-lg font-bold text-sm
@@ -67,10 +85,14 @@ const BlogOutline = () => {
           <h4 className="text-[#0B0F18] font-bold text-sm uppercase tracking-wide mb-3">Esquema del Blog:</h4>
           {isLoading ? (
             <TypingIndicator />
+          ) : error ? (
+            <div className="text-red-500 py-4" data-testid="blog-error">
+              {error}
+            </div>
           ) : (
             <div className="min-h-[150px]">
               {result ? (
-                <div className="text-[#5B667A] whitespace-pre-line animate-fadeIn text-[15px]">
+                <div className="text-[#5B667A] whitespace-pre-line animate-fadeIn text-[15px]" data-testid="blog-result">
                   {result}
                 </div>
               ) : (

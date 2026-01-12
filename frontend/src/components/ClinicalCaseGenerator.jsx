@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { caseBenefitOptions, generateMockClinicalCase } from '../data/mock';
+import axios from 'axios';
+import { caseBenefitOptions } from '../data/mock';
 import 'remixicon/fonts/remixicon.css';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const TypingIndicator = ({ color = "#007AFF" }) => (
   <div className="flex justify-center gap-1.5 py-5">
@@ -15,6 +18,7 @@ const ClinicalCaseGenerator = () => {
   const [benefit, setBenefit] = useState('Diseño de Sonrisa Digital (DSD)');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleGenerate = async () => {
     if (!treatment) {
@@ -23,14 +27,27 @@ const ClinicalCaseGenerator = () => {
     }
     setIsLoading(true);
     setResult(null);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    const response = generateMockClinicalCase(treatment, benefit);
-    setResult(response);
-    setIsLoading(false);
+    setError(null);
+    
+    try {
+      const response = await axios.post(`${API_URL}/api/ai/clinical-case`, {
+        treatment: treatment,
+        benefit: benefit
+      });
+      setResult(response.data.response);
+    } catch (err) {
+      console.error('Clinical case generation error:', err);
+      setError('Error al generar el caso clínico. Por favor, inténtalo de nuevo.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <section className="bg-[#EEF3FA] border border-[#D1D1D6] rounded-3xl p-8 md:p-[60px] mb-[100px] relative overflow-hidden">
+    <section 
+      data-testid="clinical-case-section"
+      className="bg-[#EEF3FA] border border-[#D1D1D6] rounded-3xl p-8 md:p-[60px] mb-[100px] relative overflow-hidden"
+    >
       <div className="text-center mb-10 relative z-10">
         <span className="inline-block px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide mb-4 bg-white text-[#007AFF]">
           CASOS DE ÉXITO
@@ -45,6 +62,7 @@ const ClinicalCaseGenerator = () => {
             <label className="block text-[#0B0F18] font-medium mb-2">Tipo de Tratamiento</label>
             <input
               type="text"
+              data-testid="clinical-treatment-input"
               value={treatment}
               onChange={(e) => setTreatment(e.target.value)}
               placeholder="Ej. Carillas de cerámica"
@@ -57,6 +75,7 @@ const ClinicalCaseGenerator = () => {
           <div className="mb-5">
             <label className="block text-[#0B0F18] font-medium mb-2">Beneficio Digital Clave</label>
             <select 
+              data-testid="clinical-benefit-select"
               value={benefit}
               onChange={(e) => setBenefit(e.target.value)}
               className="w-full p-4 border border-[#D1D1D6] rounded-lg bg-white text-[#0B0F18]
@@ -70,6 +89,7 @@ const ClinicalCaseGenerator = () => {
           </div>
 
           <button
+            data-testid="generate-clinical-case-btn"
             onClick={handleGenerate}
             disabled={isLoading}
             className="w-full bg-[#007AFF] text-white py-4 rounded-lg font-bold text-sm
@@ -85,8 +105,12 @@ const ClinicalCaseGenerator = () => {
           <h4 className="text-[#0B0F18] font-bold text-sm uppercase tracking-wide mb-3">Estructura del Caso:</h4>
           {isLoading ? (
             <TypingIndicator />
+          ) : error ? (
+            <div className="text-red-500 py-4" data-testid="clinical-error">
+              {error}
+            </div>
           ) : result ? (
-            <div className="text-[#5B667A] whitespace-pre-line animate-fadeIn text-[15px] leading-relaxed">
+            <div className="text-[#5B667A] whitespace-pre-line animate-fadeIn text-[15px] leading-relaxed" data-testid="clinical-result">
               {result}
             </div>
           ) : (
