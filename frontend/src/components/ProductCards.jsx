@@ -33,7 +33,7 @@ const ProductCard = ({ product }) => {
 
       {/* Product Image */}
       <div 
-        className="h-[370px] flex items-center justify-center p-6"
+        className="h-[390px] flex items-center justify-center p-6"
         style={{ 
           background: isMetit 
             ? 'linear-gradient(180deg, #FFFFFF 0%, #B3D4FF 100%)' 
@@ -43,7 +43,7 @@ const ProductCard = ({ product }) => {
         <img 
           src={product.image} 
           alt={product.name}
-          className="max-h-[340px] w-auto object-contain drop-shadow-xl"
+          className="max-h-[360px] w-auto object-contain drop-shadow-xl"
           style={{ maxWidth: '100%' }}
         />
       </div>
