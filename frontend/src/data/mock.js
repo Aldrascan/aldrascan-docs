@@ -29,7 +29,7 @@ export const products = [
       { icon: "ri-speed-line", text: "Velocidad Extrema (15 seg)" },
       { icon: "ri-fingerprint-line", text: "Interfaz 100% Táctil" }
     ],
-    image: "https://customer-assets.emergentagent.com/job_scanner-compare/artifacts/brxumwp7_MacMini%20%2B%20Mueble.png"
+    image: "https://customer-assets.emergentagent.com/job_scanner-compare/artifacts/8vfocf9c_image.png"
   },
   {
     id: 2,
