@@ -28,7 +28,7 @@ export const products = [
       { icon: "ri-speed-line", text: "Velocidad Extrema (15 seg)" },
       { icon: "ri-fingerprint-line", text: "Interfaz 100% Táctil" }
     ],
-    image: "https://customer-assets.emergentagent.com/job_scanner-compare/artifacts/xcifdnu0_Sinss%20ti%CC%81tulo%204.png"
+    image: "https://customer-assets.emergentagent.com/job_scanner-compare/artifacts/ry9eunve_MacMini%20%2B%20Mueble.png"
   },
   {
     id: 2,
@@ -43,7 +43,7 @@ export const products = [
       { icon: "ri-money-dollar-circle-line", text: "ROI Inmediato" },
       { icon: "ri-sensor-line", text: "Motion Sensing Higiénico" }
     ],
-    image: "https://customer-assets.emergentagent.com/job_scanner-compare/artifacts/ry9eunve_MacMini%20%2B%20Mueble.png"
+    image: "https://customer-assets.emergentagent.com/job_scanner-compare/artifacts/xcifdnu0_Sinss%20ti%CC%81tulo%204.png"
   }
 ];
 
