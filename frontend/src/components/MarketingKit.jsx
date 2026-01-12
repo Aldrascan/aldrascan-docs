@@ -26,7 +26,7 @@ const MarketingKit = () => {
   };
 
   return (
-    <section className="bg-gradient-to-br from-[#1e293b] to-[#0f172a] text-white rounded-3xl p-8 md:p-[60px] mb-[100px] relative overflow-hidden">
+    <section className="bg-[#0B0F18] text-white rounded-3xl p-8 md:p-[60px] mb-[100px] relative overflow-hidden">
       {/* Emoji Background */}
       <div className="absolute right-[-50px] bottom-[-50px] text-[200px] opacity-5 rotate-[-20deg] select-none">
         📢
@@ -71,8 +71,8 @@ const MarketingKit = () => {
           <button
             onClick={handleGenerate}
             disabled={isLoading}
-            className="bg-white text-[#243C5B] py-3 px-8 rounded-full font-bold text-sm uppercase tracking-wide
-                       hover:-translate-y-0.5 transition-all duration-300
+            className="bg-[#007AFF] text-white py-3 px-8 rounded-full font-bold text-sm uppercase tracking-wide
+                       hover:bg-[#0066D6] hover:-translate-y-0.5 transition-all duration-300
                        disabled:opacity-70 disabled:cursor-not-allowed
                        flex items-center gap-2 mt-3"
           >
@@ -87,11 +87,11 @@ const MarketingKit = () => {
             {isLoading ? (
               <TypingIndicator />
             ) : (
-              <div className="bg-white text-[#1F2937] rounded-xl p-5 min-h-[100px]">
+              <div className="bg-white text-[#0B0F18] rounded-xl p-5 min-h-[100px]">
                 {result ? (
                   <div className="whitespace-pre-line animate-fadeIn">{result}</div>
                 ) : (
-                  <span className="text-gray-400 italic">Tu copy aparecerá aquí...</span>
+                  <span className="text-[#5B667A] italic">Tu copy aparecerá aquí...</span>
                 )}
               </div>
             )}

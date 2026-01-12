@@ -4,7 +4,7 @@ import 'remixicon/fonts/remixicon.css';
 
 const FinalCTA = () => {
   return (
-    <section className="bg-[#243C5B] text-white rounded-[20px] py-20 px-10 text-center relative overflow-hidden mb-16 shadow-[0_20px_60px_rgba(0,0,0,0.2)]">
+    <section className="bg-[#0B0F18] text-white rounded-[20px] py-20 px-10 text-center relative overflow-hidden mb-16 shadow-[0_20px_60px_rgba(0,0,0,0.3)]">
       {/* Background Image */}
       <div 
         className="absolute inset-0 opacity-10 bg-center bg-cover grayscale"
@@ -34,7 +34,7 @@ const FinalCTA = () => {
             href={`mailto:${companyInfo.email}`}
             className="bg-transparent text-white border-2 border-white
                        px-8 py-3 rounded-full font-bold text-sm uppercase tracking-wide
-                       hover:bg-white hover:text-[#243C5B] transition-all duration-300"
+                       hover:bg-white hover:text-[#0B0F18] transition-all duration-300"
           >
             Solicitar Presupuesto
           </a>
