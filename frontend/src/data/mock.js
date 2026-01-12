@@ -45,7 +45,7 @@ export const products = [
       { icon: "ri-money-dollar-circle-line", text: "ROI Inmediato" },
       { icon: "ri-sensor-line", text: "Motion Sensing Higiénico" }
     ],
-    image: "https://customer-assets.emergentagent.com/job_scanner-compare/artifacts/w7mcvzrd_Sinss%20ti%CC%81tulo%204.png"
+    image: "https://customer-assets.emergentagent.com/job_scanner-compare/artifacts/5zhvyipt_image.png"
   }
 ];
 
