@@ -7,10 +7,12 @@ const ProductCard = ({ product }) => {
   
   return (
     <article
-      className={`bg-white rounded-3xl overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.06)]
-                  transition-transform duration-300 hover:-translate-y-[5px] flex flex-col
-                  border ${isMetit ? 'border-[#A78BFA]' : 'border-[#63B3ED]'}`}
-      style={{ borderTopWidth: '6px' }}
+      className="bg-white rounded-3xl overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.08)]
+                  transition-transform duration-300 hover:-translate-y-[5px] flex flex-col"
+      style={{ 
+        borderTop: `6px solid ${product.accentColor}`,
+        border: `1px solid ${isMetit ? '#B3D4FF' : '#E0F2FE'}`
+      }}
     >
       {/* Card Header */}
       <div className="p-10 text-center border-b border-gray-100">
@@ -20,10 +22,13 @@ const ProductCard = ({ product }) => {
         >
           {product.badge}
         </span>
-        <h2 className={`text-[28px] font-bold mb-2 ${isMetit ? 'text-[#243C5B]' : 'text-[#63B3ED]'}`}>
+        <h2 
+          className="text-[28px] font-bold mb-2"
+          style={{ color: product.accentColor }}
+        >
           {product.name}
         </h2>
-        <p className="text-[#4B5563] text-sm m-0">{product.tagline}</p>
+        <p className="text-[#5B667A] text-sm m-0">{product.tagline}</p>
       </div>
 
       {/* Product Image */}
@@ -31,38 +36,50 @@ const ProductCard = ({ product }) => {
         className="h-[350px] flex items-center justify-center p-6"
         style={{ 
           background: isMetit 
-            ? 'linear-gradient(180deg, #f8f7ff 0%, #ede9fe 100%)' 
-            : 'linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%)'
+            ? 'linear-gradient(180deg, #FFFFFF 0%, #B3D4FF 100%)' 
+            : 'linear-gradient(180deg, #FFFFFF 0%, #E0F2FE 100%)'
         }}
       >
         <img 
           src={product.image} 
           alt={product.name}
-          className="max-h-[320px] w-auto object-contain drop-shadow-lg"
+          className="max-h-[320px] w-auto object-contain drop-shadow-xl"
           style={{ maxWidth: '100%' }}
         />
       </div>
 
       {/* Card Body */}
       <div className="p-10 flex-grow flex flex-col">
-        <p className="text-[#4B5563] text-base text-center mb-8">
+        <p className="text-[#5B667A] text-base text-center mb-8">
           {product.description}
         </p>
         <ul className="space-y-4 mb-auto">
           {product.features.map((feature, index) => (
-            <li key={index} className="flex items-center text-[#4B5563]">
-              <i className={`${feature.icon} text-[#63B3ED] mr-3 text-xl`}></i>
+            <li key={index} className="flex items-center text-[#5B667A]">
+              <i 
+                className={`${feature.icon} mr-3 text-xl`}
+                style={{ color: product.accentColor }}
+              ></i>
               <span>{feature.text}</span>
             </li>
           ))}
         </ul>
         <div className="mt-8 text-center">
           <button 
-            className={`w-full py-3 px-8 rounded-full font-bold text-sm uppercase tracking-wide
-                       border-2 transition-all duration-300
-                       ${isMetit 
-                         ? 'border-[#A78BFA] text-[#A78BFA] hover:bg-[#A78BFA] hover:text-white' 
-                         : 'border-[#63B3ED] text-[#63B3ED] hover:bg-[#63B3ED] hover:text-white'}`}
+            className="w-full py-3 px-8 rounded-full font-bold text-sm uppercase tracking-wide
+                       border-2 transition-all duration-300"
+            style={{ 
+              borderColor: product.accentColor, 
+              color: product.accentColor 
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = product.accentColor;
+              e.target.style.color = 'white';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = product.accentColor;
+            }}
           >
             DETALLES
           </button>

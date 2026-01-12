@@ -20,8 +20,9 @@ export const products = [
     name: "Medit i900",
     tagline: "El estándar de oro",
     badge: "BEST SELLER",
-    badgeColor: { bg: "#ede9fe", text: "#A78BFA" },
-    accentColor: "#A78BFA",
+    badgeColor: { bg: "#B3D4FF", text: "#1A70FF" },
+    accentColor: "#1A70FF",
+    secondaryColor: "#B3D4FF",
     description: "La bestia del flujo digital. Ecosistema abierto, apps clínicas avanzadas y una velocidad extrema.",
     features: [
       { icon: "ri-apps-2-line", text: "Ecosistema Medit Link & Apps" },
@@ -35,8 +36,9 @@ export const products = [
     name: "Shining Elite",
     tagline: "Eficiencia pura",
     badge: "CALIDAD / PRECIO",
-    badgeColor: { bg: "#e0f2fe", text: "#63B3ED" },
-    accentColor: "#63B3ED",
+    badgeColor: { bg: "#E0F2FE", text: "#1174D1" },
+    accentColor: "#1174D1",
+    secondaryColor: "#1D242E",
     description: "La opción inteligente. Un escáner robusto, con un flujo de trabajo sencillo y validado.",
     features: [
       { icon: "ri-book-open-line", text: "Curva de aprendizaje cero" },
@@ -164,6 +166,22 @@ export const pitchAudienceOptions = [
   { value: "Gerente de Clínica", label: "Gerente de Clínica (Enfoque Eficiencia)" }
 ];
 
+// Color palette
+export const colors = {
+  primary: "#007AFF",
+  primaryDark: "#0066D6",
+  navy: "#0B0F18",
+  gray600: "#5B667A",
+  surface: "#EEF3FA",
+  white: "#FFFFFF",
+  appleGray: "#D1D1D6",
+  appleBlue: "#0A84FF",
+  meditBlue: "#1A70FF",
+  meditCyan: "#B3D4FF",
+  shiningBlue: "#1174D1",
+  shiningDark: "#1D242E"
+};
+
 // Mock AI response generators
 export const generateMockAIResponse = (specialty, volume, priority) => {
   const isHighVolume = volume.includes("Alto");
@@ -218,7 +236,7 @@ export const generateMockROI = (volume, cost) => {
   const monthlyImpressions = parseInt(volume) || 30;
   const costPerImpression = parseInt(cost) || 15;
   const annualSavings = monthlyImpressions * costPerImpression * 12;
-  const digitalCostPerCase = 2; // Estimado
+  const digitalCostPerCase = 2;
   const netSavings = annualSavings - (monthlyImpressions * digitalCostPerCase * 12);
   
   return `💰 ANÁLISIS DE ROI\n\n📊 Datos introducidos:\n• Impresiones/mes: ${monthlyImpressions}\n• Coste actual/impresión: ${costPerImpression}€\n\n💵 RESULTADOS:\n\n• Gasto anual actual: ${annualSavings.toLocaleString('es-ES')}€\n• Coste digital estimado: ${(monthlyImpressions * digitalCostPerCase * 12).toLocaleString('es-ES')}€/año\n• Ahorro neto anual: ${netSavings.toLocaleString('es-ES')}€\n\n⏱️ ROI estimado: ${Math.ceil(8000/netSavings * 12)} meses\n\n✅ Conclusión: La inversión se amortiza rápidamente con tu volumen de trabajo.`;
